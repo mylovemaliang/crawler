@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+ http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+       <context:annotation-config/>
+
+       <context:component-scan base-package="cn.fuyoushuo.starworld"/>
+       <tx:annotation-driven transaction-manager="transactionManager"/>
+
+       <util:properties id="config" location="classpath:config/config.properties" />
+
+       <!--spring ehcache-->
+       <cache:annotation-driven cache-manager="cacheManager" proxy-target-class="true" />
+
+       <!-- Ehcache  -->
+       <bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" >
+              <property name="configLocation" value="classpath:other/ehcache.xml"/>
+       </bean>
+
+       <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+              <property name="cacheManager" ref="cacheManagerFactory"/>
+       </bean>
+
+       <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+             init-method="init" destroy-method="close">
+              <property name="url">
+                     <value><![CDATA[jdbc:mysql://#{config['mysql.host']}:#{config['mysql.port']}/#{config['mysql.database']}?useUnicode=true&characterEncoding=gbk&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true]]></value>
+              </property>
+              <property name="username" value="#{config['mysql.username']}" />
+              <property name="password" value="#{config['mysql.password']}" />
+
+              <property name="initialSize" value="10" />
+              <property name="maxActive" value="#{config['mysql.connPoolSize']}" />
+              <property name="minIdle" value="10" />
+
+              <property name="validationQuery" value="select 'x'" />
+              <property name="testWhileIdle" value="true" />
+              <property name="testOnBorrow" value="false" />
+              <property name="testOnReturn" value="false" />
+              <property name="timeBetweenEvictionRunsMillis" value="600000" />
+              <!--<property name="removeAbandoned" value="true" />-->
+              <!--<property name="removeAbandonedTimeout" value="1800" />-->
+              <property name="filters" value="stat,slf4j" />
+       </bean>
+
+
+
+       <!-- 配置事务管理器 -->
+       <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+              <property name="dataSource" ref="dataSource" />
+       </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:other/mybatis-config.xml" />
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="mybatisScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cn.fuyoushuo.starworld.dao.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <bean id="sqlSessionTemplate" name="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+
+</beans>
