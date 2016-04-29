@@ -18,8 +18,8 @@ public class CrawlerService {
           if(!crawlerConfig.validate()) return;
           String urlRegex = crawlerConfig.getUrlRegex();
           if(!Pattern.matches(urlRegex,RootUrl)) return;
-          List<FieldItem> fields = crawlerConfig.getFields();
-          Spider.
+
+
 
 
     }

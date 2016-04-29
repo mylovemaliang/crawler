@@ -77,7 +77,11 @@ public class CommonPageProcesser implements PageProcessor {
         page.putField(name,jsonArray);
     }
 
-
+    /**
+     * 处理普通结构数据
+     * @param page
+     * @param item
+     */
     private void handlerCommonField(Page page,FieldItem item) {
         Html html = page.getHtml();
         String name = item.getName();
