@@ -9,6 +9,9 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Html;
+import us.codecraft.webmagic.selector.Selectable;
+
+import java.util.List;
 
 import java.util.Date;
 
@@ -21,25 +24,19 @@ public class Test {
 
      @org.junit.Test
      public void test1(){
-            long beginTime = new Date().getTime();
-            Spider spider = Spider.create(new PageProcessor() {
+         ResultItems resultItems = Spider.create(new PageProcessor() {
              @Override
              public void process(Page page) {
                  Html html = page.getHtml();
-                 String ename = html.$(".star_dpage_table table tbody").xpath("//tr[4]/td[2]/text()").get();
-                 page.putField("ename",ename);
+                 List<String> all = html.css(".ent_lpage_list li:lt(3)").xpath("//p[1]/a/text() | //p[2]/text()").all();
+                 System.out.println("success");
              }
-            @Override
+
+             @Override
              public Site getSite() {
                  return Site.me().setSleepTime(0);
              }
-         });
-         Object o = spider.get("http://ent.qianzhan.com/ent/star/b0110def.html");
-         spider.close();
-         long endTime = new Date().getTime();
-         System.out.println(endTime - beginTime);
+         }).get("http://ent.qianzhan.com/ent/stars?page=1");
+         System.out.println("success");
      }
-
-
-
 }
