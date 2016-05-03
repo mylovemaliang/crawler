@@ -36,7 +36,9 @@ public class CommonPageProcesser implements PageProcessor {
                  String itemName = item.getName();
                  String items = item.getItems();
                  if(!StringUtils.isEmpty(items) && items.contains(",")){
-                          handlerObjectField(page, item);
+                      handlerObjectField(page,item);
+                 }else{
+                      handlerCommonField(page,item);
                  }
                }
            }
@@ -83,6 +85,13 @@ public class CommonPageProcesser implements PageProcessor {
     private void handlerCommonField(Page page,FieldItem item) {
         Html html = page.getHtml();
         String name = item.getName();
+        String items = item.getItems();
+        //普通字段，对象字段本就不存在
+        if(!StringUtils.isEmpty(items)) return;
+        Selectable selectable = item.parseRegex(html);
+        if(!selectable.match()) page.putField(name,null);
+        String value = selectable.get();
+        page.putField(name,value);
     }
 
 }
