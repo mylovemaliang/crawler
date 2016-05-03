@@ -12,9 +12,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Html;
 import us.codecraft.webmagic.selector.Selectable;
 
-import javax.swing.text.html.HTML;
 import java.util.List;
-import java.util.jar.JarEntry;
 
 /**
  * Created by MALIANG on 2016/4/29.
