@@ -1,14 +1,12 @@
 package cn.fuyoushuo.crawler.service;
 
 import cn.fuyoushuo.crawler.config.CrawlerConfig;
-import cn.fuyoushuo.crawler.config.FieldItem;
 import cn.fuyoushuo.crawler.ext.CommonPageProcesser;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Spider;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**

@@ -9,16 +9,19 @@ import java.util.List;
  */
 public class CrawlerConfig {
 
+       //判断url是否满足爬取规则
        private String urlRegex;
 
+       //爬取字段定义
        private List<FieldItem> fields;
 
+       //是否有子任务
        private Boolean hasChildTask;
 
+       //子任务url筛选
        private String childUrlRegex;
 
-       private List<FieldItem> childFields;
-
+       //待定字段(含义暂未定义)
        private List<String> resultFields;
 
        //配置判断是否生效
@@ -59,14 +62,6 @@ public class CrawlerConfig {
 
         public void setChildUrlRegex(String childUrlRegex) {
             this.childUrlRegex = childUrlRegex;
-        }
-
-        public List<FieldItem> getChildFields() {
-            return childFields;
-        }
-
-        public void setChildFields(List<FieldItem> childFields) {
-            this.childFields = childFields;
         }
 
         public List<String> getResultFields() {

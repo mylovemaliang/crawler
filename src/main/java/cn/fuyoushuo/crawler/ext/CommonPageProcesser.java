@@ -2,6 +2,7 @@ package cn.fuyoushuo.crawler.ext;
 
 import cn.fuyoushuo.crawler.config.CrawlerConfig;
 import cn.fuyoushuo.crawler.config.FieldItem;
+import cn.fuyoushuo.crawler.config.NestedItem;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.CollectionUtils;
@@ -37,12 +38,18 @@ public class CommonPageProcesser implements PageProcessor {
                  String items = item.getItems();
                  if(!StringUtils.isEmpty(items) && items.contains(",")){
                       handlerObjectField(page,item);
-                 }else{
+                 }
+                 else if(!StringUtils.isEmpty(item.getType())&& "nested".equals(item.getType())){
+                      handlerNestedField(page,item);
+                 }
+                 else{
                       handlerCommonField(page,item);
                  }
                }
            }
        }
+
+
 
     @Override
     public Site getSite() {
@@ -50,7 +57,7 @@ public class CommonPageProcesser implements PageProcessor {
     }
 
     /**
-     * 处理对象结构数据
+     * 处理对象结构数据(非nested)
      * @param page
      * @param item
      */
@@ -89,9 +96,54 @@ public class CommonPageProcesser implements PageProcessor {
         //普通字段，对象字段本就不存在
         if(!StringUtils.isEmpty(items)) return;
         Selectable selectable = item.parseRegex(html);
-        if(!selectable.match()) page.putField(name,null);
+        if(!selectable.match()){
+            page.putField(name,null);
+            return;
+        }
         String value = selectable.get();
         page.putField(name,value);
     }
+
+    /**
+     * 处理对象结构数据(nested)
+     * @param page
+     * @param item
+     */
+    private void handlerNestedField(Page page, FieldItem item) {
+        List<NestedItem> nestedItems = item.getNestedItems();
+        if(CollectionUtils.isEmpty(nestedItems)){
+            return;
+        }
+        Html html = page.getHtml();
+        String name = item.getName();
+        Selectable selectableMain = item.parseRegex(html);
+
+        if(!selectableMain.match()){
+            return;
+        }
+        List<Selectable> nodes = selectableMain.nodes();
+        if(CollectionUtils.isEmpty(nodes)){
+            return;
+        }
+        int count = 0;
+        Integer size = item.getSize();
+        JSONArray jsonArray = new JSONArray();
+        for(Selectable node : nodes){
+          if(count == size){
+              break;
+          }
+          JSONObject jsonObject = new JSONObject();
+          for(NestedItem currItem : nestedItems){
+              String currItemName = currItem.getName();
+              Selectable selectable = currItem.parseRegex(node);
+              if(!selectable.match()) continue;
+              String result = selectable.get();
+              jsonObject.put(currItemName,result);
+          }
+          jsonArray.add(jsonObject);
+          count++;
+    }
+    page.putField(name,jsonArray);
+}
 
 }
